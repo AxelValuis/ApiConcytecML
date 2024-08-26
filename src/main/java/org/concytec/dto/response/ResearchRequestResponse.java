@@ -37,19 +37,6 @@ public class ResearchRequestResponse {
     private BigDecimal reliabilityScore;
     private List<CriteriaEvaluatedDTO> criteriaEvaluatedList;
 
-//    public static ResearchRequestResponse from(ResearchRiskPredictionEntity entity){
-//        BigDecimal reliabilityScore = entity.getSuspiciousProbability();
-//        PostulantDTO postulantDTO = PostulantDTO.create(entity.getPostulantId(), entity.getResearcherId());
-//        List<CriteriaEvaluatedDTO> criteriaEvaluatedDTOList =
-//                IntStream.range(0, entity.getCriteriaEvaluatedList().size())
-//                        .mapToObj(index -> CriteriaEvaluatedDTO.create(ResearcherAttribute.fromCode(index).getDescription()
-//                                , entity.getCriteriaEvaluatedList().get(index)))
-//                        .collect(Collectors.toList());
-//
-//        return new ResearchRequestResponse(entity.getRequestId(), postulantDTO, reliabilityScore, criteriaEvaluatedDTOList);
-//
-//    }
-
 
     public static ResearchRequestResponse from(ResearchRiskPredictionEntity entity){
         return ResearchRequestResponse.builder()
