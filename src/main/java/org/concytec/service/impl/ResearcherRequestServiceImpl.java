@@ -1,9 +1,10 @@
-package org.concytec.service;
+package org.concytec.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import org.concytec.dto.response.ResearchRequestResponse;
 import org.concytec.model.ResearchRiskPredictionEntity;
 import org.concytec.repository.ResearchRiskPredictionRepository;
+import org.concytec.service.ResearcherRequestService;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;

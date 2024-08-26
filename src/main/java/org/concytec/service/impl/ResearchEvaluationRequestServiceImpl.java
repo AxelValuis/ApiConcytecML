@@ -1,4 +1,4 @@
-package org.concytec.service;
+package org.concytec.service.impl;
 
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -6,6 +6,7 @@ import org.concytec.dto.ResearchEvaluationRequestResponse;
 import org.concytec.exception.GenericClientException;
 import org.concytec.model.ResearchEvaluationRequestEntity;
 import org.concytec.repository.ResearchEvaluationRequestRepository;
+import org.concytec.service.ResearchEvaluationRequestService;
 import org.springframework.core.env.Environment;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
@@ -19,11 +20,11 @@ import java.util.Map;
 @Service
 @Slf4j
 @RequiredArgsConstructor
-public class ResearchEvaluationRequestServiceImpl implements ResearchEvaluationRequestService{
+public class ResearchEvaluationRequestServiceImpl implements ResearchEvaluationRequestService {
 
     private final RestTemplate restTemplate;
     private final ResearchEvaluationRequestRepository researchEvaluationRequestRepository;
-    private final ElsevierService elsevierService;
+    private final ElsevierServiceImpl elsevierService;
     private final Environment environment;
 
     public ResearchEvaluationRequestResponse predict(Long researcherId) {
