@@ -6,7 +6,7 @@ import javax.persistence.*;
 @Data
 @Entity
 @Table(name = "tbl_hechos_ml")
-public class AuthorData {
+public class ResearchEvaluationRequestEntity {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)

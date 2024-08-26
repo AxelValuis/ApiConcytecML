@@ -1,52 +1,71 @@
 package org.concytec.service;
 
+import lombok.RequiredArgsConstructor;
+import org.concytec.exception.GenericClientException;
+import org.concytec.model.ResearchEvaluationRequestEntity;
+import org.json.JSONObject;
+import org.springframework.core.env.Environment;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-import org.json.JSONObject;
+import org.springframework.web.util.UriComponentsBuilder;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
+import org.xml.sax.InputSource;
+
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import java.io.StringReader;
 
 @Service
+@RequiredArgsConstructor
 public class ElsevierService {
 
     private final RestTemplate restTemplate;
-    private static final Logger logger = LoggerFactory.getLogger(ElsevierService.class); // Declarar el logger
+    private final Environment environment;
 
-    @Autowired
-    public ElsevierService(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
+    public double getHIndex(ResearchEvaluationRequestEntity researchEvaluationRequestEntity ) {
+        String basePath = environment.getProperty("server.url.elsevier");
+        String view = environment.getProperty("server.url.elsevier.view");
+        String apiKey = environment.getProperty("server.url.elsevier.api-key");
+        String token = environment.getProperty("server.url.elsevier.insttoken");
 
-    public double getHIndex(String authorId) {
-        String url = "https://api.elsevier.com/content/author/author_id/" + authorId +
-                "?view=ENHANCED&apiKey=69938da9607d1b0a4084a58332abbd95&insttoken=2702f4b17a35eab090ef9f70fd64d8d1";
-
-        logger.info("Calling Elsevier API with URL: {}", url);
+        String url = UriComponentsBuilder.fromHttpUrl(basePath + researchEvaluationRequestEntity.getIdPerfilScopus().toString())
+                .queryParam("view", view)
+                .queryParam("apiKey", apiKey)
+                .queryParam("insttoken", token)
+                .toUriString();
 
         String response = restTemplate.getForObject(url, String.class);
+        if (responseContainsError(response)){
+            return researchEvaluationRequestEntity.getIndiceH().doubleValue();
+        }
+        String hIndexFromXML = getHIndexFromXML(response);
+        return Double.parseDouble(hIndexFromXML);
+    }
 
-        logger.info("Received response from Elsevier API: {}", response);
-
-        try {
-            // Verificar si la respuesta es JSON
-            if (response.trim().startsWith("{")) {
-                JSONObject jsonResponse = new JSONObject(response);
-                JSONObject authorRetrievalResponse = jsonResponse.getJSONArray("author-retrieval-response").getJSONObject(0);
-                if (authorRetrievalResponse.has("h-index")) {
-                    String hIndexStr = authorRetrievalResponse.getString("h-index");
-                    return Double.parseDouble(hIndexStr);
-                } else {
-                    logger.error("h-index is not available for authorId {}", authorId);
-                    throw new RuntimeException("h-index not found in Elsevier API response");
-                }
-            } else {
-                logger.error("Received unexpected format from Elsevier API for authorId {}", authorId);
-                throw new RuntimeException("Unexpected response format from Elsevier API");
+    private boolean responseContainsError(String response) {
+        if (response.trim().startsWith("<")) {
+            if (response.contains("<statusCode>RESOURCE_NOT_FOUND</statusCode>")) {
+                return true;
             }
+        }
+        return false;
+    }
+
+    public static String getHIndexFromXML(String xmlData) {
+        try {
+            DocumentBuilderFactory factory = DocumentBuilderFactory.newInstance();
+            DocumentBuilder builder = factory.newDocumentBuilder();
+            InputSource is = new InputSource(new StringReader(xmlData));
+            Document document = builder.parse(is);
+            NodeList hIndexNodes = document.getElementsByTagName("h-index");
+            if (hIndexNodes.getLength() <= 0) {
+               throw new GenericClientException("NOT_FOUND", "H Index not found", HttpStatus.NOT_FOUND);
+            }
+            return hIndexNodes.item(0).getTextContent();
         } catch (Exception e) {
-            logger.error("Failed to parse h-index from Elsevier API response", e);
-            throw new RuntimeException("Failed to parse h-index from Elsevier API response", e);
+            throw new GenericClientException("INTERNAL_SERVER_ERROR", "Error processing XML", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 

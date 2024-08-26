@@ -13,7 +13,7 @@ import java.util.List;
 @NoArgsConstructor
 @Entity
 @Table(name = "tbl_predict_ml")
-public class ResearchRequestEntity {
+public class ResearchRiskPredictionEntity {
 
     @Id
     @Column(name = "solicitud_id")

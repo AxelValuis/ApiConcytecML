@@ -6,7 +6,7 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import java.util.List;
 
 @Data
-public class PredictionResponse {
+public class ResearchEvaluationRequestResponse {
 
     @JsonProperty("Importancia_variables")
     private List<Double> importanciaVariables;

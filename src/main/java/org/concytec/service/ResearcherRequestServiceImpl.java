@@ -2,8 +2,8 @@ package org.concytec.service;
 
 import lombok.RequiredArgsConstructor;
 import org.concytec.dto.response.ResearchRequestResponse;
-import org.concytec.model.ResearchRequestEntity;
-import org.concytec.repository.ResearchRequestRepository;
+import org.concytec.model.ResearchRiskPredictionEntity;
+import org.concytec.repository.ResearchRiskPredictionRepository;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
@@ -17,13 +17,13 @@ import java.util.List;
 @RequiredArgsConstructor
 public class ResearcherRequestServiceImpl implements ResearcherRequestService {
 
-    private final ResearchRequestRepository researchRequestRepository;
+    private final ResearchRiskPredictionRepository researchRiskPredictionRepository;
 
     @Override
     public List<ResearchRequestResponse> findAllRequestResearch(Integer page, Integer size, BigInteger postulantId, BigDecimal minimumReliabilityScore) {
         Pageable pageable = new PageRequest(page, size);
         BigDecimal suspiciousProbability = BigDecimal.ONE.subtract(minimumReliabilityScore);
-        Page<ResearchRequestEntity> researchRequestEntities = researchRequestRepository
+        Page<ResearchRiskPredictionEntity> researchRequestEntities = researchRiskPredictionRepository
                 .findBySuspiciousProbabilityLessThan(suspiciousProbability, pageable);
         return researchRequestEntities.map(ResearchRequestResponse::from).getContent();
     }

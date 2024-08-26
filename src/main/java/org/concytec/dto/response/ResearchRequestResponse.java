@@ -6,7 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.concytec.dto.CriteriaEvaluatedDTO;
 import org.concytec.dto.PostulantDTO;
-import org.concytec.model.ResearchRequestEntity;
+import org.concytec.enums.ResearcherAttribute;
+import org.concytec.model.ResearchRiskPredictionEntity;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -24,12 +25,13 @@ public class ResearchRequestResponse {
     private BigDecimal reliabilityScore;
     private List<CriteriaEvaluatedDTO> criteriaEvaluatedList;
 
-    public static ResearchRequestResponse from(ResearchRequestEntity entity){
-        BigDecimal reliabilityScore = BigDecimal.ONE.subtract(entity.getSuspiciousProbability());
+    public static ResearchRequestResponse from(ResearchRiskPredictionEntity entity){
+        BigDecimal reliabilityScore = entity.getSuspiciousProbability();
         PostulantDTO postulantDTO = PostulantDTO.create(entity.getPostulantId(), entity.getResearcherId());
         List<CriteriaEvaluatedDTO> criteriaEvaluatedDTOList =
                 IntStream.range(0, entity.getCriteriaEvaluatedList().size())
-                        .mapToObj(index -> CriteriaEvaluatedDTO.create("Criteria " + (index + 1), entity.getCriteriaEvaluatedList().get(index)))
+                        .mapToObj(index -> CriteriaEvaluatedDTO.create(ResearcherAttribute.fromCode(index).getDescription()
+                                , entity.getCriteriaEvaluatedList().get(index)))
                         .collect(Collectors.toList());
 
         return new ResearchRequestResponse(entity.getRequestId(), postulantDTO, reliabilityScore, criteriaEvaluatedDTOList);

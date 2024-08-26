@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.context.request.WebRequest;
 
 import javax.persistence.EntityNotFoundException;
+import javax.servlet.http.HttpServletRequest;
 
 @ControllerAdvice
 public class GlobalExceptionHandler {
@@ -19,5 +20,12 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(EntityNotFoundException.class)
     public ResponseEntity<?> handleEntityNotFoundException(EntityNotFoundException ex, WebRequest request) {
         return new ResponseEntity<>("Resource not found: " + ex.getMessage(), HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(GenericClientException.class)
+    public ResponseEntity<ErrorDTO> handleGenericClientException(GenericClientException exception, HttpServletRequest request) {
+        String path = request.getRequestURI();
+        ErrorDTO dto = ErrorDTO.from(exception, path);
+        return ResponseEntity.status(dto.getHttpStatus()).body(dto);
     }
 }
