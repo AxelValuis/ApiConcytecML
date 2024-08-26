@@ -26,9 +26,9 @@ public class ElsevierService {
 
     public double getHIndex(ResearchEvaluationRequestEntity researchEvaluationRequestEntity ) {
         String basePath = environment.getProperty("server.url.elsevier");
-        String view = environment.getProperty("server.url.elsevier.view");
-        String apiKey = environment.getProperty("server.url.elsevier.api-key");
-        String token = environment.getProperty("server.url.elsevier.insttoken");
+        String view = environment.getProperty("server.url.elservier.view");
+        String apiKey = environment.getProperty("server.url.elservier.api-key");
+        String token = environment.getProperty("server.url.elservier.insttoken");
 
         String url = UriComponentsBuilder.fromHttpUrl(basePath + researchEvaluationRequestEntity.getIdPerfilScopus().toString())
                 .queryParam("view", view)
