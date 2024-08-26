@@ -11,6 +11,7 @@ import org.concytec.model.ResearchRiskPredictionEntity;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.sql.Timestamp;
 import java.util.List;
 import java.util.stream.Collectors;
 import java.util.stream.IntStream;
@@ -21,20 +22,55 @@ import java.util.stream.IntStream;
 @Builder
 public class ResearchRequestResponse {
     private BigInteger requestId;
-    private PostulantDTO postulant;
+    private String tipodoc;
+    //private PostulantDTO postulant;
+    private String numdoc;
+    private String nombres;
+    private String correo;
+    private String supervisor;
+    private String revisor;
+    private Timestamp fechaSolicitud;
+    private String estado;
+    private String constancia;
+    private Boolean observado;
+
     private BigDecimal reliabilityScore;
     private List<CriteriaEvaluatedDTO> criteriaEvaluatedList;
 
+//    public static ResearchRequestResponse from(ResearchRiskPredictionEntity entity){
+//        BigDecimal reliabilityScore = entity.getSuspiciousProbability();
+//        PostulantDTO postulantDTO = PostulantDTO.create(entity.getPostulantId(), entity.getResearcherId());
+//        List<CriteriaEvaluatedDTO> criteriaEvaluatedDTOList =
+//                IntStream.range(0, entity.getCriteriaEvaluatedList().size())
+//                        .mapToObj(index -> CriteriaEvaluatedDTO.create(ResearcherAttribute.fromCode(index).getDescription()
+//                                , entity.getCriteriaEvaluatedList().get(index)))
+//                        .collect(Collectors.toList());
+//
+//        return new ResearchRequestResponse(entity.getRequestId(), postulantDTO, reliabilityScore, criteriaEvaluatedDTOList);
+//
+//    }
+
+
     public static ResearchRequestResponse from(ResearchRiskPredictionEntity entity){
-        BigDecimal reliabilityScore = entity.getSuspiciousProbability();
-        PostulantDTO postulantDTO = PostulantDTO.create(entity.getPostulantId(), entity.getResearcherId());
-        List<CriteriaEvaluatedDTO> criteriaEvaluatedDTOList =
-                IntStream.range(0, entity.getCriteriaEvaluatedList().size())
-                        .mapToObj(index -> CriteriaEvaluatedDTO.create(ResearcherAttribute.fromCode(index).getDescription()
-                                , entity.getCriteriaEvaluatedList().get(index)))
-                        .collect(Collectors.toList());
-
-        return new ResearchRequestResponse(entity.getRequestId(), postulantDTO, reliabilityScore, criteriaEvaluatedDTOList);
-
+        return ResearchRequestResponse.builder()
+                .requestId(entity.getRequestId())
+                .tipodoc(entity.getPostulante().getTipodoc())
+                .numdoc(entity.getPostulante().getNumdoc())
+                .nombres(entity.getPostulante().getNombres() + " " + entity.getPostulante().getApellidoPaterno() + " " + entity.getPostulante().getApellidoMaterno())
+                .correo(entity.getPostulante().getCorreo())
+                .supervisor(entity.getSolicitud().getSupervisor().getNombres())
+                .revisor(entity.getSolicitud().getRevisor().getNombres())
+                .fechaSolicitud(entity.getSolicitud().getFechaSolicitud())
+                .estado(entity.getSolicitud().getEstado())
+                .constancia(entity.getSolicitud().getConstancia())
+                .observado(entity.getSolicitud().getObservado())
+                .reliabilityScore(entity.getSuspiciousProbability())
+                .criteriaEvaluatedList(IntStream.range(0, entity.getCriteriaEvaluatedList().size())
+                        .mapToObj(index -> CriteriaEvaluatedDTO.create(ResearcherAttribute.fromCode(index).getDescription(), entity.getCriteriaEvaluatedList().get(index)))
+                        .collect(Collectors.toList()))
+                .build();
     }
+
+
+
 }

@@ -31,4 +31,12 @@ public class ResearchRiskPredictionEntity {
     @Column(name = "var_import")
     @Convert(converter = JsonBigDecimalListConverter.class)
     private List<BigDecimal> criteriaEvaluatedList;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "solicitud_id", insertable = false, updatable = false)
+    private SolicitudEntity solicitud;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name= "postulante_id", insertable = false, updatable= false)
+    private PostulanteEntity postulante;
 }

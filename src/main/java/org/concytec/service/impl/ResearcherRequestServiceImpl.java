@@ -24,10 +24,19 @@ public class ResearcherRequestServiceImpl implements ResearcherRequestService {
     public List<ResearchRequestResponse> findAllRequestResearch(Integer page, Integer size, BigInteger postulantId, BigDecimal minimumReliabilityScore) {
         Pageable pageable = new PageRequest(page, size);
         BigDecimal suspiciousProbability = BigDecimal.ONE.subtract(minimumReliabilityScore);
-        Page<ResearchRiskPredictionEntity> researchRequestEntities = researchRiskPredictionRepository
-                .findBySuspiciousProbabilityLessThan(suspiciousProbability, pageable);
+
+        Page<ResearchRiskPredictionEntity> researchRequestEntities;
+        if (postulantId != null) {
+            researchRequestEntities = researchRiskPredictionRepository
+                    .findBySuspiciousProbabilityLessThanAndPostulantId(suspiciousProbability, postulantId, pageable);
+        } else {
+            researchRequestEntities = researchRiskPredictionRepository
+                    .findBySuspiciousProbabilityLessThan(suspiciousProbability, pageable);
+        }
+
         return researchRequestEntities.map(ResearchRequestResponse::from).getContent();
     }
+
 
     @Override
     public ResearchRequestResponse findRequestResearchByRequestId(int requestId) {
